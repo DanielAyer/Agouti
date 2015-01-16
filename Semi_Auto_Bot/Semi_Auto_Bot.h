@@ -20,13 +20,13 @@ class Semi_Auto_Bot
 	
 	// Declare int constants to never be changed in program.
 	
-	const static int pingPin = 10;  // Pin attached to the ping sensor.
-	const static int left = 4;  // Left servo variable to store pin.;
-	const static int right = 5; // Right servo variable to store pin.;
-	const static int rotTime = 5000;  // Set time in milliseconds to perform continuous rotation.
-	const static int critDist =30;	// Stop distance in cm.
-	const static int leftZero = 90;  // Zero throttle write setting for left servo.  (Use zeroThrottle function to find this value for any given servo).
-	const static int rightZero = 90;  // Zero throttle write setting for right servo. (Use zeroThrottle function to find this value for any given servo).
+	const static int PING_PIN = 10;  // Pin attached to the ping sensor.
+	const static int LEFT = 4;  // Left servo variable to store pin.;
+	const static int RIGHT = 5; // Right servo variable to store pin.;
+	const static int ROTATION_TIME = 5000;  // Set time in milliseconds to perform continuous rotation.
+	const static int CRITICAL_DISTANCE =30;	// Stop distance in cm.
+	const static int LEFT_SERVO_ZERO = 90;  // Zero throttle write setting for left servo.  (Use zeroThrottle function to find this value for any given servo).
+	const static int RIGHT_SERVO_ZERO = 90;  // Zero throttle write setting for right servo. (Use zeroThrottle function to find this value for any given servo).
 	
 	// Declare ints to be modified later.
 	int toThere; // Variable to hold bearing to object.

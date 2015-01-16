@@ -9,8 +9,7 @@
 	
 Semi_Auto_Bot::Semi_Auto_Bot()  // Constructor called when object is initialized.
 {		
-	Servo myServoLeft;  //  Declare left Servo.
-	Servo myServoRight; // Declare right Servo.
+
 }
 
 
@@ -48,15 +47,15 @@ double Semi_Auto_Bot::distance()  // Call this function to measure the distance 
 
   duration = 0;  // Set duration to zero every time routine runs.
 
-  pinMode(pingPin, OUTPUT);  // Sets the ping sensor to output to generate signal.
-  digitalWrite(pingPin, LOW);  // Sets the voltage of the pin to zero.
+  pinMode(PING_PIN, OUTPUT);  // Sets the ping sensor to output to generate signal.
+  digitalWrite(PING_PIN, LOW);  // Sets the voltage of the pin to zero.
   delayMicroseconds(2);  // Ensures completion of previous steps.
-  digitalWrite(pingPin, HIGH);  // Sets the voltage of the pin to not zero and generates an outgoing pulse. (Depending on the board 3 volts to 5 volts).
+  digitalWrite(PING_PIN, HIGH);  // Sets the voltage of the pin to not zero and generates an outgoing pulse. (Depending on the board 3 volts to 5 volts).
   delayMicroseconds(5);  // Ensures a pulse duration of 5 microseconds.
-  digitalWrite(pingPin, LOW);  //  Sets the voltage of the ping sensor to zero.
+  digitalWrite(PING_PIN, LOW);  //  Sets the voltage of the ping sensor to zero.
 
-  pinMode(pingPin, INPUT);  // Sets the ping sensor to input to receive signal.
-  duration = pulseIn(pingPin, HIGH);  // Waits for the ping sensor to respond to a signal and reports the elapsed time in microseconds.
+  pinMode(PING_PIN, INPUT);  // Sets the ping sensor to input to receive signal.
+  duration = pulseIn(PING_PIN, HIGH);  // Waits for the ping sensor to respond to a signal and reports the elapsed time in microseconds.
 
  duration = duration / 48;  // Convert duration to centimeters.
 
@@ -64,22 +63,23 @@ return duration;	// Return distance in cm.
  } 
 
 int Semi_Auto_Bot::isLinear() // Determine if motion is linear or non-linear.  If non-linear indicates drift. Returns 0 for non-linear motion and 1 for linear motion.
-	{ 	/* We assume constant speed.  With constant speed the time variable is allowed to be omitted.  If speed is fluctuating this function is inappropriate.
-	     Assuming an irregular surroundings, if speed is constant then the acceleration should be zero.  If acceleration is not zero then the bot is deviating from a
+	{ 	/* We assume constant speed.  With constant speed the time variable is allowed to be omitted.  If speed is fluctuating this function is 
+inappropriate.
+	     Assuming an irregular surroundings, if speed is constant then the acceleration should be zero.  If acceleration is not zero then the bot 
+is deviating from a
 		 linear trajectory. */
 		 
-	i = 0;  // Variable to hold array index.
-      distances[i] = distance();  // Get first distance.
+	  distances[0] = distance();  // Get first distance.
 
-      distances[i+1] = distance();  // Get second distance.
+      distances[1] = distance();  // Get second distance.
 
-      derivatives[0] = distances[i+1] - distances[i];  // Get first delta distance.
+      derivatives[0] = distances[1] - distances[0];  // Get first delta distance.
 
-      distances[i] = distance();  // Get third distance.
+      distances[0] = distance();  // Get third distance.
 
-      distances[i+1] = distance();  // Get fourth distance.
+      distances[1] = distance();  // Get fourth distance.
  
-      derivatives[1] = distances[i+1] - distances[i];  // Get second delta distance.
+      derivatives[1] = distances[1] - distances[0];  // Get second delta distance.
 
       derivatives[2] = derivatives[1] - derivatives[0];  // Get second derivative of distance.
 
@@ -98,7 +98,8 @@ int Semi_Auto_Bot::isLinear() // Determine if motion is linear or non-linear.  I
 int Semi_Auto_Bot::zeroThrottle(Servo myServo, int pZero)	
 /* Find zero rotation.  Takes passed servo plus presumed zero write for throttle.  Use this to modify the throttle settings.
    This function is designed to be used on a rotating bot assuming an irregular surrounding.  
-   This can be used on a stationary bot by holding an object in front of the sensor.  Modify the distance of the object to the sensor until the wheels 
+   This can be used on a stationary bot by holding an object in front of the sensor.  Modify the distance of the object to the sensor until the 
+wheels 
    stop rotating.  When wheels are stopped hold the object stationary.  The function will return the write command sent to the stopped wheels.
 */
 	{   i = pZero; // Incrementing variable for throttle test.
