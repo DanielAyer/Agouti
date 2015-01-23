@@ -1,6 +1,6 @@
 /*
   Semi_Auto_Bot.cpp - Library for a semi-autonomous Arduino Uno controlled Hex-Bot.
- Created by Daniel Ian Ayer, 01122015.
+ Created by Daniel Ian Ayer, 01222015.
  Released into the public domain. 
  */
 
@@ -20,32 +20,32 @@ Semi_Auto_Bot::~Semi_Auto_Bot()  // Destructor called when object is cleaned up.
 
 double Semi_Auto_Bot::farthest(int rTime) // This function measures the farthest distance recorded during the time interval rTime in milliseconds.	
 	{	
-		farthestDist = 0;  // Variable to hold farthest distance.
-		currentDist = 0;  // Variable to hold current distance.
+		double farthestDistance = 0;  // Variable to hold farthest distance.
+		double currentDistance = 0;  // Variable to hold current distance.
  
-		t1 = 0;  // Set initial time to zero.
-		t2 = 0;  // Set second time to zero.
+		int t1 = 0;  // Set initial time to zero.
+		int t2 = 0;  // Set second time to zero.
 		
 		t1 = millis();  // Get first time stamp.
 		
       while (t2 - t1 < rTime)  // Rotate for rotTime milliseconds.
-        {   currentDist = distance();  // Get current distance.
+        {   currentDistance = distance();  // Get current distance.
             
-            if (farthestDist < currentDist) 
+            if (farthestDistance < currentDistance) 
              {  // Current distance is farther than farthest distance recorded.
-                farthestDist = currentDist;  // Store new farthest distance.
+                farthestDistance = currentDistance;  // Store new farthest distance.
              } 
 				
 			t2 = millis(); // Refresh second time stamp.
         }
 		
-		return farthestDist;  // Toss back farthest recorded distance.
+		return farthestDistance;  // Toss back farthest recorded distance.
 	}
 	
 double Semi_Auto_Bot::distance()  // Call this function to measure the distance to an object using the ping sensor.
 { // According to Arduino Cookbook ISBN:978-1-449-31387-6 the maximum range of this sensor is 3m and the min is 2cm.
 
-  duration = 0;  // Set duration to zero every time routine runs.
+  double duration = 0;  // Set duration to zero every time routine runs.
 
   pinMode(PING_PIN, OUTPUT);  // Sets the ping sensor to output to generate signal.
   digitalWrite(PING_PIN, LOW);  // Sets the voltage of the pin to zero.
@@ -95,51 +95,64 @@ is deviating from a
 		}
 	}
 	
-int Semi_Auto_Bot::zeroThrottle(Servo myServo, int pZero)	
+int Semi_Auto_Bot::zeroThrottle(Servo myServo, int presumedZero)	
 /* Find zero rotation.  Takes passed servo plus presumed zero write for throttle.  Use this to modify the throttle settings.
    This function is designed to be used on a rotating bot assuming an irregular surrounding.  
    This can be used on a stationary bot by holding an object in front of the sensor.  Modify the distance of the object to the sensor until the 
 wheels 
    stop rotating.  When wheels are stopped hold the object stationary.  The function will return the write command sent to the stopped wheels.
 */
-	{   i = pZero; // Incrementing variable for throttle test.
-		d1 = 0;  // Set initial distance to zero.
-		d2 = 0; // Set second distance to zero.
-        dDistance = 0;  // Set delta distance to zero.
+	{   int i = presumedZero; // Incrementing variable for throttle test.
+		int upperLimit = 135; // Variable sets upper limit of throttle test.
+		double distance1 = 0;  // Set initial distance to zero.
+		double distance2 = 0; // Set second distance to zero.
+        double dDistance = 0;  // Set delta distance to zero.
 		
-        while (i <= uLim)
+        while (i <= upperLimit)
             {  //Test from presumed zero of 90 and increment to 135.  135 is presumed half forward.
 			    myServo.write(i);  // Write possible zero rotation.
 
-                d1 = distance();  // Get initial distance.
+                distance1 = distance();  // Get initial distance.
 
                 delay(500);  // Delay half a second.
                                  
-                d2 = distance();  // Get second distance.
+                distance2 = distance();  // Get second distance.
                   
-                dDistance = d2-d1;  // Calculate delta distance.
+                dDistance = distance2-distance1;  // Calculate delta distance.
 
                 if (dDistance == 0)  // If we think wheels aren't moving.
 					{     
 						delay(3000);  // Wait three seconds to ensure wheels are actually stopped.
 					
-						d1 = distance(); // Measure distance again.
+						distance1 = distance(); // Measure distance again.
 					
-						dDistance = d2-d1; // Recalculate delta distance.
+						dDistance = distance2-distance1; // Recalculate delta distance.
 					
 							if (dDistance == 0)  // Wheels are actually stopped.
 								{
 									return i;  // Toss back the zero for the servo.
 								}
 					}                     
-				else if (i == uLim) 
+				else if (i == upperLimit) 
 					{   // Increment test has failed.  No zero has been located between writes of 90 to 135.				
-						i = pZero;  // Reset i to presumed zero.
+						i = presumedZero;  // Reset i to presumed zero.
 					}
 				i++;  // Increment write variable.	
 
             }
-    } 
+	}
+	
+void Semi_Auto_Bot::turnServos(Servo myServoRight, Servo myServoLeft, int sentThrottleSignal)
+	{  // Send sentThrottleSignal to both servos.
+		myServoRight.write(sentThrottleSignal);  // Rotate right servo.
+        myServoLeft.write(sentThrottleSignal);  // Rotate left servo.
+	}
+	
+void Semi_Auto_Bot::turnServos(Servo myServoRight, Servo myServoLeft, int sentThrottleSignalRight, int sentThrottleSignalLeft)
+	{  // Send unique throttle signals to each servo.
+		myServoRight.write(sentThrottleSignalRight);  // Rotate right servo.
+        myServoLeft.write(sentThrottleSignalLeft);  // Rotate left servo.
+	}
 
 
 
