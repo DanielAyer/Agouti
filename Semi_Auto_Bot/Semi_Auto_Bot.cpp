@@ -25,18 +25,20 @@ double Semi_Auto_Bot::farthest(int rTime) // This function measures the farthest
  
 		int t1 = 0;  // Set initial time to zero.
 		int t2 = 0;  // Set second time to zero.
+		int currentTimeElapsed = 0;	// Variable used to hold elapsed time.
 		
 		t1 = millis();  // Get first time stamp.
 		
-      while (t2 - t1 < rTime)  // Rotate for rotTime milliseconds.
+      while (currentTimeElapsed < rTime)  // Rotate for rotTime milliseconds.
         {   currentDistance = distance();  // Get current distance.
             
+			t2 = millis(); // Refresh second time stamp.
+			currentTimeElapsed = t2 - t1;  // Calculate current elapsed time.
+			
             if (farthestDistance < currentDistance) 
              {  // Current distance is farther than farthest distance recorded.
                 farthestDistance = currentDistance;  // Store new farthest distance.
              } 
-				
-			t2 = millis(); // Refresh second time stamp.
         }
 		
 		return farthestDistance;  // Toss back farthest recorded distance.
